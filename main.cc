@@ -5,10 +5,24 @@
 #include "vec3.h"
 
 
+bool hit_sphere(const point3 &center, double radius, const ray &r) {
+    // determine if ray `r` intersects sphere centeres at `center` with radius `radius`
+    vec3 oc = r.origin() - center;
+    auto a = dot(r.direction(), r.direction());
+    auto b = 2.0 * dot(oc, r.direction());
+    auto c = dot(oc, oc) - radius * radius;
+    auto discriminant = b * b - 4 * a * c;
+    return (discriminant > 0);
+}
+
 color ray_color(const ray& r) {
+    // if intersects sphere, color red
+    if (hit_sphere(point3(0, 0, -1), 0.5, r))
+        return color(1, 0, 0);
+    // otherwise, color using background gradient
     vec3 unit_direction = unit_vector(r.direction());
     // t is a parameter that goes from 0 to 1 as y goes from -1 to 1
-    // use t to create a gradient from white (t=1) to blue (t=0)
+    // use t to create a gradient from blue (t=1) to white (t=0)
     auto t = 0.5*(unit_direction.y() + 1.0);
     return (1.0-t)*color(1.0, 1.0, 1.0) + t*color(0.5, 0.7, 1.0);
 }
